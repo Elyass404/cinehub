@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
+@org.springframework.transaction.annotation.Transactional(readOnly = true)
 public class CategoryService implements CategoryServiceInterface {
 
     final CategoryRepository categoryRepository;
