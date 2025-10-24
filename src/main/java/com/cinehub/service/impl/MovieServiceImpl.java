@@ -14,12 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Concrete implementation of MovieService, handling DTO-to-Entity conversion
- * and transaction management.
- */
 @Service
 @Transactional(readOnly = true)
 public class MovieServiceImpl implements MovieService {
@@ -28,7 +25,7 @@ public class MovieServiceImpl implements MovieService {
     private final DirectorRepository directorRepository;
     private final CategoryRepository categoryRepository;
 
-    // Constructor Injection for all required Repositories
+    // Constructor Injection for all dependencies
     public MovieServiceImpl(MovieRepository movieRepository,
                             DirectorRepository directorRepository,
                             CategoryRepository categoryRepository) {
@@ -37,109 +34,121 @@ public class MovieServiceImpl implements MovieService {
         this.categoryRepository = categoryRepository;
     }
 
-    @Override
-    @Transactional // Write operation
-    public MovieResponseDTO save(MovieRequestDTO dto) {
+    /**
+     * Helper method to convert Entity to Response DTO
+     */
+    private MovieResponseDTO toDto(Movie movie) {
+        MovieResponseDTO dto = new MovieResponseDTO();
 
-        // --- CRITICAL DTO-TO-ENTITY MAPPING LOGIC ---
+        // 1. Map Core Movie Fields (These are the ones returning null)
+        dto.setId(movie.getId());
+        dto.setTitle(movie.getTitle());
 
-        // 1. Fetch Related Entities: Ensure Director and Category exist in the DB.
+        // <--- CRITICAL: ADD THESE MISSING LINES --->
+        dto.setDescription(movie.getDescription());
+        dto.setSynopsis(movie.getSynopsis());
+        dto.setRating(movie.getRating());
+        dto.setDuration(movie.getDuration()); // Ensure type compatibility (int vs Integer)
+        dto.setReleaseDate(movie.getReleaseDate());
+
+        // 2. Map Relational IDs and Names
+        // IDs (Confirmed to be working: 4 and 3 in your output)
+        dto.setDirectorId(movie.getDirector().getId());
+        dto.setCategoryId(movie.getCategory().getId());
+
+        // Names (These rely on the Director/Category fields being correctly filled)
+        // NOTE: Director's full name must be constructed from first and last names
+        Director director = movie.getDirector();
+        dto.setDirectorFullName(director.getFirstName() + " " + director.getLastName());
+
+        // Category Name
+        dto.setCategoryName(movie.getCategory().getName());
+
+        return dto;
+    }
+
+    /**
+     * Helper method to map DTO fields onto a Movie Entity,
+     * including resolving the Director and Category entities from their IDs.
+     */
+    private Movie mapFromDto(MovieRequestDTO dto, Movie movie) {
+        // Resolve Director and Category Entities from their IDs
         Director director = directorRepository.findById(dto.getDirectorId())
                 .orElseThrow(() -> new NoSuchElementException("Director not found with ID: " + dto.getDirectorId()));
 
         Category category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new NoSuchElementException("Category not found with ID: " + dto.getCategoryId()));
 
-        // 2. Map DTO data to a new Movie Entity
-        Movie movie = new Movie();
-        // NOTE: For an update, you would fetch the existing movie here: movieRepository.findById(id).get()
-
+        // Map primitive fields
         movie.setTitle(dto.getTitle());
         movie.setDescription(dto.getDescription());
         movie.setSynopsis(dto.getSynopsis());
         movie.setRating(dto.getRating());
-        movie.setDuration(dto.getDuration());
+        movie.setDuration(dto.getDuration() != null ? dto.getDuration() : 0); // Handle Integer vs int
         movie.setReleaseDate(dto.getReleaseDate());
 
-        // 3. Set the complex relationships
+        // Map relationships
         movie.setDirector(director);
         movie.setCategory(category);
 
-        // 4. Save the fully-constructed Entity
-        Movie savedMovie = movieRepository.save(movie);
+        return movie;
+    }
 
-        // 5. Convert the saved Entity back to a Response DTO for return
-        return convertToResponseDTO(savedMovie);
+
+    // ------------------------------------------------------------------
+    // CRUD IMPLEMENTATION
+    // ------------------------------------------------------------------
+
+    @Override
+    @Transactional // Write operation
+    public MovieResponseDTO save(MovieRequestDTO movieDto) {
+        Movie movie = new Movie();
+        movie = mapFromDto(movieDto, movie); // Use the helper to populate the entity
+        Movie savedMovie = movieRepository.save(movie);
+        return toDto(savedMovie);
     }
 
     @Override
     public List<MovieResponseDTO> findAll() {
-        // Fetch all entities, then use streams to convert each one to a DTO
         return movieRepository.findAll().stream()
-                .map(this::convertToResponseDTO) // Method reference to the mapper
+                .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public MovieResponseDTO findById(Long id) {
-        // Find the Entity, handle the case where it doesn't exist, and convert
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Movie not found with ID: " + id));
-        return convertToResponseDTO(movie);
+        return toDto(movie);
     }
 
     @Override
-    public MovieResponseDTO findByTitle(String title) {
-        // 1. Call the custom repository method. Use Optional for safety.
-        Movie movie = movieRepository.findByTitle(title)
-                // 2. Handle the "not found" scenario by throwing a standard exception.
-                .orElseThrow(() -> new NoSuchElementException("Movie not found with title: " + title));
+    @Transactional // Write operation
+    public MovieResponseDTO update(Long id, MovieRequestDTO movieDto) {
+        Movie existingMovie = movieRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Movie not found with ID: " + id));
 
-        // 3. Convert the found Entity back to a Response DTO before returning.
-        return convertToResponseDTO(movie);
+        // Use the helper method to apply DTO fields and resolve relationships
+        existingMovie = mapFromDto(movieDto, existingMovie);
+
+        Movie updatedMovie = movieRepository.save(existingMovie);
+        return toDto(updatedMovie);
     }
 
     @Override
-    @Transactional
+    @Transactional // Write operation
     public void delete(Long id) {
         if (!movieRepository.existsById(id)) {
-            throw new NoSuchElementException("Cannot delete. Movie not found with ID: " + id);
+            throw new NoSuchElementException("Movie not found with ID: " + id);
         }
         movieRepository.deleteById(id);
     }
 
-    // --- PRIVATE UTILITY METHOD (MAPPING) ---
-
-    /**
-     * Converts a Movie Entity into a simplified MovieResponseDTO.
-     * @param movie The JPA managed Entity.
-     * @return The DTO ready for JSON serialization.
-     */
-    private MovieResponseDTO convertToResponseDTO(Movie movie) {
-        Director director = movie.getDirector();
-        Category category = movie.getCategory();
-
-        // NOTE: We rely on the LAZY loading here. The findById above triggered a load.
-        // In findAll(), fetching the related data here will often cause N+1 query issue.
-        // A more advanced solution would use JOIN FETCH in a custom repository method,
-        // but this approach is correct for a basic service implementation.
-
-        return new MovieResponseDTO(
-                movie.getId(),
-                movie.getTitle(),
-                movie.getDescription(),
-                movie.getSynopsis(),
-                movie.getRating(),
-                movie.getDuration(),
-                movie.getReleaseDate(),
-
-                // Director Details
-                director.getId(),
-                director.getFirstName() + " " + director.getLastName(),
-
-                // Category Details
-                category.getId(),
-                category.getName()
-        );
+    @Override
+    public MovieResponseDTO findByTitle(String title) {
+        // This relies on your custom method in the repository
+        Movie movie = movieRepository.findByTitle(title)
+                .orElseThrow(() -> new NoSuchElementException("Movie not found with title: " + title));
+        return toDto(movie);
     }
 }

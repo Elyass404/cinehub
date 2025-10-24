@@ -9,6 +9,7 @@ public interface MovieService {
     MovieResponseDTO save(MovieRequestDTO movieDto);
     List<MovieResponseDTO> findAll();
     MovieResponseDTO findById(Long id);
+    MovieResponseDTO update(Long id, MovieRequestDTO movieDto);
     void delete(Long id);
 
     //Here again a custom method to find the movies by name

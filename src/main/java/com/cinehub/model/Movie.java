@@ -1,5 +1,6 @@
 package com.cinehub.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -23,11 +24,13 @@ public class Movie {
     // RELATIONSHIP 1: Many Movies to One Director
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "director_id", nullable = false)
+    @JsonIgnoreProperties({"movies"})
     private Director director;
 
     // RELATIONSHIP 2: Many Movies to One Category
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
+    @JsonIgnoreProperties({"movies"})
     private Category category;
 
     // Default Constructor (Required by JPA/Hibernate)

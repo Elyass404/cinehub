@@ -74,6 +74,21 @@ public class MovieController {
         }
     }
 
-    // NOTE: For a full API, you would also add PUT/PATCH for updates, which also
-    // uses the MovieRequestDTO.
+    // --- 5. PUT: Update an Existing Movie ---
+    // Accepts DTO and returns Response DTO
+    // Endpoint: PUT /movies/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<MovieResponseDTO> updateMovie(
+            @PathVariable Long id,
+            @RequestBody MovieRequestDTO movieDto) {
+
+        try {
+            MovieResponseDTO updatedMovie = movieService.update(id, movieDto);
+            return ResponseEntity.ok(updatedMovie); // HTTP 200 OK
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build(); // HTTP 404 Not Found
+        }
+    }
+
+
 }
