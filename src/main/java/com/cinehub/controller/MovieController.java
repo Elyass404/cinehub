@@ -90,5 +90,52 @@ public class MovieController {
         }
     }
 
+    // Endpoint: GET /movies/title/{title}
+    @GetMapping("/title/{title}")
+    public ResponseEntity<MovieResponseDTO> getMovieByTitle(@PathVariable String title) {
+
+        return movieService.findByTitle(title)
+                .map(ResponseEntity::ok)      // If found (Optional is present), return 200 OK
+                .orElse(ResponseEntity.notFound().build()); // If not found, return 404 Not Found
+    }
+
+
+    // Endpoint: GET /movies/filter/year/{year}
+    @GetMapping("/filter/year/{year}")
+    public ResponseEntity<List<MovieResponseDTO>> getMoviesByReleaseYear(@PathVariable int year) {
+
+        List<MovieResponseDTO> movies = movieService.findByReleaseYear(year);
+
+        if (movies.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(movies);
+    }
+
+
+    // Endpoint: GET /movies/filter/min-rating/{minRating}
+    @GetMapping("/filter/min-rating/{minRating}")
+    public ResponseEntity<List<MovieResponseDTO>> getMoviesByMinRating(@PathVariable Double minRating) {
+
+        List<MovieResponseDTO> movies = movieService.findByMinRating(minRating);
+
+        if (movies.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(movies);
+    }
+
+    // Endpoint: GET /movies/category/{categoryId}
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<List<MovieResponseDTO>> getMoviesByCategory(@PathVariable Long categoryId) {
+
+        List<MovieResponseDTO> movies = movieService.findByCategoryId(categoryId);
+
+        if (movies.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(movies);
+    }
 
 }
