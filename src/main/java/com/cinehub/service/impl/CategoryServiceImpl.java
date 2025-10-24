@@ -39,6 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id){
 
         if(!categoryRepository.existsById(id)){
