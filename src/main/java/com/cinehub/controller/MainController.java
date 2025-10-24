@@ -1,6 +1,6 @@
 package com.cinehub.controller;
 
-import com.cinehub.service.CategoryService;
+import com.cinehub.service.impl.CategoryServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,9 +13,9 @@ import java.util.List;
 @RequestMapping("/ayman")
 public class MainController {
 
-    private CategoryService ser;
+    private CategoryServiceImpl ser;
 
-    public MainController(CategoryService ser) {
+    public MainController(CategoryServiceImpl ser) {
         this.ser = ser;
     }
 

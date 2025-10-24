@@ -1,13 +1,17 @@
 package com.cinehub.service;
 
+import com.cinehub.dto.MovieRequestDTO;
+import com.cinehub.dto.MovieResponseDTO;
 import com.cinehub.model.Movie;
 
+import java.util.List;
+
 public interface MovieServiceInterface {
-    Movie save(Movie movie);
-    Movie findAll();
-    Movie findById(Long id);
+    MovieResponseDTO save(MovieRequestDTO movieDto);
+    List<MovieResponseDTO> findAll();
+    MovieResponseDTO findById(Long id);
     void delete(Long id);
 
     //Here again a custom method to find the movies by name
-    Movie findByName(String name);
+    MovieResponseDTO findByTitle(String title);
 }
