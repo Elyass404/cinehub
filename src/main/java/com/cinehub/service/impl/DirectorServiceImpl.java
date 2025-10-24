@@ -41,6 +41,8 @@ public class DirectorServiceImpl implements DirectorService {
         if (!directorRepository.existsById(id)){
             throw new NoSuchElementException("There is no director found with the id: " + id +" to be deleted");
         }
+
+        directorRepository.deleteById(id);
     }
 
     @Override
@@ -56,7 +58,7 @@ public class DirectorServiceImpl implements DirectorService {
         director.setBiography(newDirector.getBiography());
 
         //now saving the new information for the director
-        return directorRepository.save(newDirector);
+        return directorRepository.save(director);
     }
 
     @Override
