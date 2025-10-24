@@ -64,4 +64,23 @@ public class CategoryController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    // --- 5. PUT: Update an Existing Category ---
+    // Endpoint: PUT /categories/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<Category> updateCategory(
+            @PathVariable Long id,
+            @RequestBody Category categoryDetails) {
+
+        try {
+            // Call the service to perform the update logic
+            Category updatedCategory = categoryService.update(id, categoryDetails);
+
+            // HTTP 200 OK with the updated resource
+            return ResponseEntity.ok(updatedCategory);
+        } catch (NoSuchElementException e) {
+            // If findById/update throws, return 404
+            return ResponseEntity.notFound().build(); // HTTP 404 Not Found
+        }
+    }
 }

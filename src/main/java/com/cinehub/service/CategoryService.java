@@ -9,6 +9,7 @@ public interface CategoryService {
     Category save(Category category);
     List<Category> findAll();
     Category findById(Long id);
+    Category update(Long id, Category newcategory);
     void delete (Long id);
 
     //custom method to find by name

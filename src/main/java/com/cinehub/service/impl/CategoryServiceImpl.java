@@ -40,6 +40,16 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    public Category update(Long id, Category newcategory){
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Category not found to be updated"));
+
+        category.setName(newcategory.getName());
+        return categoryRepository.save(category);
+    }
+
+    @Override
+    @Transactional
     public void delete(Long id){
 
         if(!categoryRepository.existsById(id)){
