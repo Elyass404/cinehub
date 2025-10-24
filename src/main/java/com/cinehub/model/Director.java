@@ -1,5 +1,6 @@
 package com.cinehub.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class Director {
 
     // RELATIONSHIP: One Director can have Many Movies.
     // Mapped by the 'director' field in the Movie class.
+    @JsonIgnore
     @OneToMany(mappedBy = "director", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Movie> movies = new ArrayList<>(); // Initialize to avoid NullPointerException
 

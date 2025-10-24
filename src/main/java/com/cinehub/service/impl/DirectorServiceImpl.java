@@ -44,6 +44,22 @@ public class DirectorServiceImpl implements DirectorService {
     }
 
     @Override
+    @Transactional
+    public Director update(Long id, Director newDirector){
+        Director director = directorRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("There is no Director with the following id:" + id  + " to be updated!"));
+
+        director.setFirstName(newDirector.getFirstName());
+        director.setLastName(newDirector.getLastName());
+        director.setNationality(newDirector.getNationality());
+        director.setBirthDate(newDirector.getBirthDate());
+        director.setBiography(newDirector.getBiography());
+
+        //now saving the new information for the director
+        return directorRepository.save(newDirector);
+    }
+
+    @Override
     public Director findByName(String name){
         //todo : this method mzl madertch l code dyalha
         //categoryRepository.findByName(name);
