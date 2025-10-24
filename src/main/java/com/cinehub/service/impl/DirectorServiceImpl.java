@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @org.springframework.transaction.annotation.Transactional(readOnly = true)
@@ -62,9 +63,7 @@ public class DirectorServiceImpl implements DirectorService {
     }
 
     @Override
-    public Director findByName(String name){
-        //todo : this method mzl madertch l code dyalha
-        //categoryRepository.findByName(name);
-        return null ;
+    public Optional<Director> findByFullName(String firstName, String lastName){
+        return directorRepository.findByFirstNameAndLastName(firstName, lastName);
     }
 }

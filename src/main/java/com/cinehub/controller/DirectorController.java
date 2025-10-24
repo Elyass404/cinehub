@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/directors") // Base URL
@@ -74,6 +75,24 @@ public class DirectorController {
             return ResponseEntity.noContent().build(); // HTTP 204 No Content
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    // --- 6. Search: Search director by his full name ---
+    // Endpoint: GET /directors/search?firstName=...&lastName=...
+    @GetMapping("/search")
+    public ResponseEntity<Director> searchDirectorByFullName(
+            @RequestParam String firstName,
+            @RequestParam String lastName) {
+
+        // The service method returns Optional<Director>
+        Optional<Director> directorOptional = directorService.findByFullName(firstName, lastName);
+
+        // Map the Optional result to the appropriate HTTP response
+        if (directorOptional.isPresent()) {
+            return ResponseEntity.ok(directorOptional.get()); // HTTP 200 OK
+        } else {
+            return ResponseEntity.notFound().build(); // HTTP 404 Not Found
         }
     }
 }

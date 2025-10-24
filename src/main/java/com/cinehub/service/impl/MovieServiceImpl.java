@@ -12,6 +12,7 @@ import com.cinehub.service.MovieService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -145,10 +146,43 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public MovieResponseDTO findByTitle(String title) {
-        // This relies on your custom method in the repository
-        Movie movie = movieRepository.findByTitle(title)
-                .orElseThrow(() -> new NoSuchElementException("Movie not found with title: " + title));
-        return toDto(movie);
+    public Optional<MovieResponseDTO> findByTitle(String title) {
+        // 1. Get the Optional<Movie> from the Repository
+        Optional<Movie> movieOptional = movieRepository.findByTitle(title);
+
+        // 2. Map the Movie (if present) to a MovieResponseDTO, and return the new Optional
+        return movieOptional.map(this::toDto);
+    }
+
+    @Override
+    public List<MovieResponseDTO> findByReleaseYear(int year) {
+
+        LocalDate startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = LocalDate.of(year, 12, 31);
+
+        return movieRepository.findByReleaseDateBetween(startDate, endDate).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public List<MovieResponseDTO> findByMinRating(Double minRating) {
+        if (minRating == null) {
+            // Or throw IllegalArgumentException, depending on preferred error handling
+            return findAll();
+        }
+        return movieRepository.findByRatingGreaterThanEqual(minRating).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public List<MovieResponseDTO> findByCategoryId(Long categoryId) {
+
+        return movieRepository.findByCategoryId(categoryId).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 }

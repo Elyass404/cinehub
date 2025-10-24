@@ -3,6 +3,7 @@ package com.cinehub.service;
 import com.cinehub.model.Director;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DirectorService {
 
@@ -13,5 +14,5 @@ public interface DirectorService {
     void delete (Long id);
 
     //This is a custom method to find the director by name
-    Director findByName(String name);
+    Optional<Director> findByFullName(String firstName, String lastName);
 }
