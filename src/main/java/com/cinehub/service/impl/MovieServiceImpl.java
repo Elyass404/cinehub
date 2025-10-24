@@ -8,7 +8,7 @@ import com.cinehub.model.Movie;
 import com.cinehub.repository.CategoryRepository;
 import com.cinehub.repository.DirectorRepository;
 import com.cinehub.repository.MovieRepository;
-import com.cinehub.service.MovieServiceInterface;
+import com.cinehub.service.MovieService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional(readOnly = true)
-public class MovieServiceImpl implements MovieServiceInterface {
+public class MovieServiceImpl implements MovieService {
 
     private final MovieRepository movieRepository;
     private final DirectorRepository directorRepository;

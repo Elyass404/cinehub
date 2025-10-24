@@ -4,7 +4,7 @@ import com.cinehub.model.Category;
 
 import java.util.List;
 
-public interface CategoryServiceInterface {
+public interface CategoryService {
 
     Category save(Category category);
     List<Category> findAll();

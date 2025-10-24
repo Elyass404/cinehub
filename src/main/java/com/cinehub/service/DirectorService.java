@@ -1,12 +1,10 @@
 package com.cinehub.service;
 
 import com.cinehub.model.Director;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public interface DirectorServiceInterface  {
+public interface DirectorService {
 
     Director save(Director category);
     List<Director> findAll();

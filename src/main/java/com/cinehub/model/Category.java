@@ -12,7 +12,7 @@ public class Category {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private long id;
 
-    private String Name;
+    private String name;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Movie> movies;
@@ -21,7 +21,7 @@ public class Category {
 
     public Category(long id, String name, List<Movie> movies) {
         this.id = id;
-        Name = name;
+        this.name = name;
         this.movies = movies;
     }
 
@@ -35,11 +35,11 @@ public class Category {
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public List<Movie> getMovies() {

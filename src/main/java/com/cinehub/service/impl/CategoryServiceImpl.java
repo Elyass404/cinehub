@@ -2,7 +2,7 @@ package com.cinehub.service.impl;
 
 import com.cinehub.model.Category;
 import com.cinehub.repository.CategoryRepository;
-import com.cinehub.service.CategoryServiceInterface;
+import com.cinehub.service.CategoryService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
 
 @Service
 @org.springframework.transaction.annotation.Transactional(readOnly = true)
-public class CategoryServiceImpl implements CategoryServiceInterface {
+public class CategoryServiceImpl implements CategoryService {
 
     final CategoryRepository categoryRepository;
 

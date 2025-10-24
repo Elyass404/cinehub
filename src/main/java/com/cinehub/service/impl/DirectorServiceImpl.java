@@ -2,7 +2,7 @@ package com.cinehub.service.impl;
 
 import com.cinehub.model.Director;
 import com.cinehub.repository.DirectorRepository;
-import com.cinehub.service.DirectorServiceInterface;
+import com.cinehub.service.DirectorService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
 
 @Service
 @org.springframework.transaction.annotation.Transactional(readOnly = true)
-public class DirectorServiceImpl implements DirectorServiceInterface {
+public class DirectorServiceImpl implements DirectorService {
 
     DirectorRepository directorRepository;
     public DirectorServiceImpl(DirectorRepository directorRepository){

@@ -3,11 +3,13 @@ package com.cinehub.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories; // <-- NEW IMPORT
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement; // <-- NEW IMPORT
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.sql.DataSource;
@@ -16,70 +18,48 @@ import java.util.Properties;
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = "com.cinehub")
+// 1. Enables Spring to find and implement your Repository interfaces (DirectorRepository, etc.)
+@EnableJpaRepositories(basePackages = "com.cinehub.repository")
+// 2. Enables the @Transactional annotation to work for your services
+@EnableTransactionManagement
 public class AppConfig {
 
-    // --- 1. Data Source (Connection details to the H2 database) ---
-
+    // --- 1. Data Source (Connection details) ---
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-
-        // --- 1. MySQL Driver Class ---
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-
-        // --- 2. MySQL Connection URL ---
         dataSource.setUrl("jdbc:mysql://localhost:3306/cinehub_db?serverTimezone=UTC");
-
-        // --- 3. XAMPP Default Credentials ---
-        dataSource.setUsername("root"); // Default XAMPP MySQL username
-        dataSource.setPassword("");      // Default XAMPP MySQL password (blank)
+        dataSource.setUsername("root");
+        dataSource.setPassword("");
         return dataSource;
     }
 
     // --- 2. Entity Manager Factory (Hibernate Configuration) ---
-
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
-
-        // 1. Link to the database connection (the dataSource() bean above)
         emf.setDataSource(dataSource());
+        emf.setPackagesToScan("com.cinehub.model"); // Where to find your @Entity classes
 
-        // 2. Tell Hibernate where to find your @Entity classes
-        emf.setPackagesToScan("com.cinehub.model");
-
-        // 3. Set the persistence provider (Hibernate) and its adapter
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         emf.setJpaVendorAdapter(vendorAdapter);
 
-        // 4. Set the Hibernate properties
         Properties jpaProperties = new Properties();
-
-        // Automatically create/update the database schema
-        // Note: 'update' is good for development; 'none' is better for production.
         jpaProperties.setProperty("hibernate.hbm2ddl.auto", "update");
-
-        // Print SQL statements to the console
         jpaProperties.setProperty("hibernate.show_sql", "true");
-
-        // Format the printed SQL nicely
         jpaProperties.setProperty("hibernate.format_sql", "true");
-
-        // *** CRITICAL CHANGE: Use the MySQL Dialect ***
         jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
 
         emf.setJpaProperties(jpaProperties);
         return emf;
     }
 
-    // --- 3. Transaction Manager (Crucial for ACID properties) ---
-
+    // --- 3. Transaction Manager ---
     @Bean
     public PlatformTransactionManager transactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-        // Link the transaction manager to the configured EntityManager
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
         return transactionManager;
     }
-
 }

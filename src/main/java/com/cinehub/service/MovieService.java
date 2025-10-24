@@ -2,11 +2,10 @@ package com.cinehub.service;
 
 import com.cinehub.dto.MovieRequestDTO;
 import com.cinehub.dto.MovieResponseDTO;
-import com.cinehub.model.Movie;
 
 import java.util.List;
 
-public interface MovieServiceInterface {
+public interface MovieService {
     MovieResponseDTO save(MovieRequestDTO movieDto);
     List<MovieResponseDTO> findAll();
     MovieResponseDTO findById(Long id);
