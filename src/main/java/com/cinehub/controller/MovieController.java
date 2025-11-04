@@ -90,6 +90,14 @@ public class MovieController {
         }
     }
 
+    //to find the list of movies by the name of the director
+    @GetMapping("/bydirector")
+    public ResponseEntity<List<MovieResponseDTO>> getMoviesByDirectorName(@RequestParam String directorName) {
+        List<MovieResponseDTO> movies = movieService.findMoviesByDirectorName(directorName);
+
+        return ResponseEntity.ok(movies);
+    }
+
     // Endpoint: GET /movies/title/{title}
     @GetMapping("/title/{title}")
     public ResponseEntity<MovieResponseDTO> getMovieByTitle(@PathVariable String title) {

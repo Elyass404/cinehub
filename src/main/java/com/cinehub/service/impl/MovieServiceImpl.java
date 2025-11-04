@@ -185,4 +185,12 @@ public class MovieServiceImpl implements MovieService {
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public  List<MovieResponseDTO> findMoviesByDirectorName(String directorName){
+
+        return movieRepository.findMoviesByDirector_FirstName(directorName).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
 }

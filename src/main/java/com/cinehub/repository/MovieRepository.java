@@ -25,4 +25,6 @@ public interface MovieRepository extends JpaRepository<Movie,Long> {
 
     //Consult all movies of a given category id
     List<Movie> findByCategoryId(Long categoryId);
+
+    List<Movie> findMoviesByDirector_FirstName(String directorFirstName);
 }

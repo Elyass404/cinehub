@@ -25,4 +25,6 @@ public interface MovieService {
     // Consult all movies of a given category
     List<MovieResponseDTO> findByCategoryId(Long categoryId);
 
+    //get movies by the name of the director
+    List<MovieResponseDTO> findMoviesByDirectorName(String directorName);
 }
